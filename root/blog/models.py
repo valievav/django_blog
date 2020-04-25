@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from taggit.managers import TaggableManager
 
 
 # custom manager (useful shortcut if some db operations are performed often)
@@ -15,7 +16,6 @@ class Post(models.Model):
     objects = models.Manager()  # default manager (1st manager declared in a model is default one)
     published = PublishedManager()  # custom manager (shortcut to exclude status='published' in a query)
 
-
     STATUS_CHOICES = (('draft', 'Draft'),
                       ('published', 'Published'))
     # model fields
@@ -27,6 +27,8 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)  # sets date to now (used for creation)
     updated = models.DateTimeField(auto_now=True)  # sets to date now (used for last modified, updates field on save())
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+
+    tags = TaggableManager()  # to add tags
 
     class Meta:
         ordering = ('-publish',)
