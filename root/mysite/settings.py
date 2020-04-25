@@ -119,3 +119,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Email settings
+# to send emails comment EMAIL_BACKEND (used for debug only)
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # to print emails to console
+
+EMAIL_HOST = 'smtp.gmail.com'  # smtp server for gmail
+
+EMAIL_PORT = 587  # smtp port for gmail
+
+EMAIL_HOST_USER = '********@gmail.com'
+
+EMAIL_HOST_PASSWORD = '********'
+
+EMAIL_USE_TLS = True  # TSL encryption

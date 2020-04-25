@@ -1,7 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
+from django.core.mail import send_mail
+from django.conf import settings
 from .models import Post
+from .forms import EmailPostForm
 
 
 # class-based view
@@ -40,3 +43,27 @@ def post_detail(request, year, month, day, post):
     return render(request,
                   'blog/post/detail.html',
                   {'post': post})
+
+
+def post_share(request, post_id):
+    post = get_object_or_404(Post, id=post_id,
+                             status='published')
+    sent = False
+    if request.method == 'POST':  # user submitted form
+        form = EmailPostForm(request.POST)  # prepare form with data
+        if form.is_valid():
+            cd = form.cleaned_data  # dict with valid fields
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+            subject = f"{cd['name']} recommends you to read '{post.title}'"
+            message = f"Read post '{post.title}' at {post_url}\n\n" \
+                      f"{cd['name']}\'s comments: {cd['comments']}\n\n" \
+                      f"{cd['name']}\'s email: {cd['email']}"
+
+            send_mail(subject, message, settings.EMAIL_HOST_USER, [cd['email_to']])
+            sent = True  # for template to display success message
+    else:
+        form = EmailPostForm()  # display empty form
+
+    return render(request, 'blog/post/share.html', {'post': post,
+                                                    'form': form,
+                                                    'sent': sent})
