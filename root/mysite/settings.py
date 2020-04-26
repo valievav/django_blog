@@ -132,6 +132,6 @@ EMAIL_PORT = 587  # smtp port for gmail
 
 EMAIL_HOST_USER = '********@gmail.com'
 
-EMAIL_HOST_PASSWORD = '********'
+EMAIL_HOST_PASSWORD = '************'  # gmail App Password
 
 EMAIL_USE_TLS = True  # TSL encryption
