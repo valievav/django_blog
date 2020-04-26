@@ -3,6 +3,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db.models import Count
 from taggit.models import Tag
 from .models import Post
 from .forms import EmailPostForm, CommentForm
@@ -58,12 +59,18 @@ def post_detail(request, year, month, day, post):
     else:
         comment_form = CommentForm()  # display empty form
 
+    # finding similar posts by # of tags
+    post_tags_ids = post.tags.values_list('id', flat=True)  # flat - to get list of int instead of list of 1-elem tuples
+    similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
+
     return render(request,
                   'blog/post/detail.html',
                   {'post': post,
                    'comments': comments,
                    'new_comment': new_comment,
-                   'comment_form': comment_form})
+                   'comment_form': comment_form,
+                   'similar_posts': similar_posts})
 
 
 def post_share(request, post_id):
